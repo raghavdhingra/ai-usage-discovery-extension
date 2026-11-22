@@ -25,7 +25,7 @@ export default defineConfig({
     name: 'Straiker',
     description: 'Straiker Chrome extension',
     version: "0.0.1",
-    permissions: [],
+    permissions: ['storage'],
     icons: {
       16: 'icon/16.png',
       32: 'icon/32.png',

@@ -14,6 +14,13 @@ export interface SignalDefinition {
 
 export type DetectionMethod = 'domain' | 'signal';
 
+export interface AiTool {
+  toolId: string;
+  name: string;
+  category: string;
+  domains: string[];
+}
+
 export type InteractionType = 'prompt-submit' | 'ai-button';
 
 export interface AiVisit {
