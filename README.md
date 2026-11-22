@@ -49,15 +49,15 @@ src/
   popup/                popup UI that reads storage and shows the summary
   scripts/
     content.ts          runs in each page: domain check and in-page signal detection
-    background.ts       service worker: receives detections, deduplicates them and saves to storage
+    service-worker.ts   service worker: receives detections, deduplicates them and saves to storage
 wxt.config.ts           build config and manifest (permissions etc.)
 ```
 
 Data flow:
 
 1. The content script detects an AI tool on the page.
-2. It sends a message to the background script.
-3. The background script updates the record in `chrome.storage.local`.
+2. It sends a message to the service worker.
+3. The service worker updates the record in `chrome.storage.local`.
 4. The popup reads that storage and renders the summary.
 
 ## Tech stack

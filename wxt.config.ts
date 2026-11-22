@@ -1,5 +1,6 @@
 import { defineConfig } from 'wxt';
 import { resolve } from 'node:path';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
@@ -7,11 +8,14 @@ export default defineConfig({
   entrypointsDir: '.',
   publicDir: 'public',
   outDir: 'dist',
+  vite: () => ({
+    plugins: [tailwindcss()],
+  }),
 
   hooks: {
     'entrypoints:found': (_wxt, infos) => {
       infos.push(
-        { name: 'background', type: 'background', inputPath: resolve('src/scripts/background.ts') },
+        { name: 'service-worker', type: 'background', inputPath: resolve('src/scripts/service-worker.ts') },
         { name: 'content', type: 'content-script', inputPath: resolve('src/scripts/content.ts') },
       );
     },
