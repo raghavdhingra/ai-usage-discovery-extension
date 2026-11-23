@@ -1,4 +1,4 @@
-export type StatusVariant = 'ai' | 'not-ai' | 'unsupported' | 'error';
+export type StatusVariant = 'ai' | 'not-ai' | 'unsupported' | 'error' | 'used' | 'visited';
 
 const VARIANTS: Record<StatusVariant, { label: string; className: string; dotClassName: string }> = {
   ai: {
@@ -20,6 +20,16 @@ const VARIANTS: Record<StatusVariant, { label: string; className: string; dotCla
     label: 'Something went wrong',
     className: 'bg-status-error-soft text-status-error',
     dotClassName: 'bg-status-error',
+  },
+  used: {
+    label: 'Used',
+    className: 'bg-status-ai-soft text-status-ai',
+    dotClassName: 'bg-status-ai',
+  },
+  visited: {
+    label: 'Visited',
+    className: 'bg-status-neutral-soft text-status-neutral',
+    dotClassName: 'bg-status-neutral',
   },
 };
 

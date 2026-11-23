@@ -7,7 +7,6 @@ export type SignalId =
   | 'chat-controls';
 
 export interface SignalDefinition {
-  id: SignalId;
   label: string;
   weight: number;
 }

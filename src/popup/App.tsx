@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { getCurrentWindowId, openSidePanel } from '@/common/chrome/sidePanel';
 import { Loader } from '@/common/components/Loader';
 import type { PopupState } from '@/common/types/site';
 import { PopupLayout } from '@/popup/layout/PopupLayout';
@@ -27,12 +28,24 @@ function renderView(state: PopupState) {
 export function App() {
   const state = usePopupStore((store) => store.state);
   const load = usePopupStore((store) => store.load);
+  const [windowId, setWindowId] = useState<number>();
 
   useEffect(() => {
     void load();
+    void getCurrentWindowId().then(setWindowId);
   }, [load]);
 
+  const openDetails = () => {
+    if (windowId === undefined) return;
+    void openSidePanel(windowId).then(() => window.close());
+  };
+
   return (
-    <PopupLayout footerDisabled={state.status === 'loading'}>{renderView(state)}</PopupLayout>
+    <PopupLayout
+      footerDisabled={state.status === 'loading' || windowId === undefined}
+      onOpenDetails={openDetails}
+    >
+      {renderView(state)}
+    </PopupLayout>
   );
 }

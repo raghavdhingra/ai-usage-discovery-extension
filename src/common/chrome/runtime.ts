@@ -2,37 +2,45 @@ import type {
   Message,
   MessagePayload,
   MessageResponse,
+  MessageSender,
   MessageType,
 } from '@/common/types/messages';
 
-type PayloadArgs<T extends MessageType> = MessagePayload<T> extends void ? [] : [MessagePayload<T>];
-
-function isMessageOfType<T extends MessageType>(message: unknown, type: T): message is Message<T> {
-  return typeof message === 'object' && message !== null && (message as Message).type === type;
-}
-
 export function sendMessage<T extends MessageType>(
   type: T,
-  ...[payload]: PayloadArgs<T>
+  payload?: MessagePayload<T>,
 ): Promise<MessageResponse<T>> {
   return browser.runtime.sendMessage({ type, payload });
 }
 
 export function onMessage<T extends MessageType>(
   type: T,
-  handler: (payload: MessagePayload<T>) => MessageResponse<T> | Promise<MessageResponse<T>>,
-): void {
-  browser.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
-    if (!isMessageOfType(message, type)) return false;
+  handler: (
+    payload: MessagePayload<T>,
+    sender: MessageSender,
+  ) => MessageResponse<T> | Promise<MessageResponse<T>>,
+): () => void {
+  const listener = (
+    message: Message | undefined,
+    sender: { tab?: { id?: number } },
+    sendResponse: (response?: unknown) => void,
+  ) => {
+    if (message?.type !== type) return false;
 
-    Promise.resolve(message.payload)
-      .then(handler)
-      .then(sendResponse)
-      .catch((error: unknown) => {
+    const respond = async () => {
+      try {
+        const payload = message.payload as MessagePayload<T>;
+        sendResponse(await handler(payload, { tabId: sender.tab?.id }));
+      } catch (error) {
         console.error(`[Straiker] ${type} handler failed`, error);
         sendResponse(undefined);
-      });
+      }
+    };
 
+    void respond();
     return true;
-  });
+  };
+
+  browser.runtime.onMessage.addListener(listener);
+  return () => browser.runtime.onMessage.removeListener(listener);
 }

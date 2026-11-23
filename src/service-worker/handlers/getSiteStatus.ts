@@ -23,9 +23,10 @@ export async function getSiteStatus(): Promise<SiteStatus> {
   const tool = matchDomain(hostname);
   if (!tool) return { status: 'not-ai', hostname, signals: [], confidence: 'none' };
 
-  const lastUsedAt = (await getVisits())
+  const usedTimes = (await getVisits())
     .filter((visit) => visit.toolId === tool.toolId && visit.interacted)
-    .reduce<number | null>((latest, visit) => Math.max(latest ?? 0, visit.detectedAt), null);
+    .map((visit) => visit.detectedAt);
+  const lastUsedAt = usedTimes.length > 0 ? Math.max(...usedTimes) : null;
 
   return {
     status: 'ai',
