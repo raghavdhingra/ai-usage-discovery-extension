@@ -1,16 +1,14 @@
-import type { ConfidenceLevel } from '@/common/types/site';
-
 const SEGMENTS = 4;
 
-const LEVELS: Record<ConfidenceLevel, { label: string; filled: number; fillClass: string }> = {
-  none: { label: 'None', filled: 0, fillClass: 'bg-confidence-track' },
-  low: { label: 'Low', filled: 1, fillClass: 'bg-confidence-low' },
-  medium: { label: 'Medium', filled: 3, fillClass: 'bg-confidence-medium' },
-  high: { label: 'High', filled: 4, fillClass: 'bg-confidence-high' },
-};
+function fillClass(percent: number): string {
+  if (percent >= 80) return 'bg-confidence-high';
+  if (percent >= 50) return 'bg-confidence-medium';
+  return 'bg-confidence-low';
+}
 
-export function ConfidenceMeter({ level }: { level: ConfidenceLevel }) {
-  const { label, filled, fillClass } = LEVELS[level];
+export function ConfidenceMeter({ percent }: { percent: number }) {
+  const filled = Math.round((percent / 100) * SEGMENTS);
+  const label = `${percent}%`;
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -23,14 +21,14 @@ export function ConfidenceMeter({ level }: { level: ConfidenceLevel }) {
         role="meter"
         aria-label="AI confidence"
         aria-valuemin={0}
-        aria-valuemax={SEGMENTS}
-        aria-valuenow={filled}
+        aria-valuemax={100}
+        aria-valuenow={percent}
         aria-valuetext={label}
       >
         {Array.from({ length: SEGMENTS }, (_, index) => (
           <span
             key={index}
-            className={`h-1.5 rounded-full ${index < filled ? fillClass : 'bg-confidence-track'}`}
+            className={`h-1.5 rounded-full ${index < filled ? fillClass(percent) : 'bg-confidence-track'}`}
           />
         ))}
       </div>

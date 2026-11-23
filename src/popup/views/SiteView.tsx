@@ -24,7 +24,7 @@ export function SiteView({ data }: { data: AiSiteStatus | NotAiSiteStatus }) {
         </div>
       )}
 
-      <ConfidenceMeter level={data.confidence} />
+      <ConfidenceMeter percent={data.confidence} />
       <SignalList signals={data.signals} method={isAi ? data.method : undefined} />
 
       {isAi && (

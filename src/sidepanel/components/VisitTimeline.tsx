@@ -20,7 +20,11 @@ export function VisitTimeline({ visit }: { visit: AiVisit }) {
       </div>
 
       <ul className="ml-1 flex flex-col gap-1 border-l border-line pl-3">
-        {interactions.length === 0 ? (
+        {visit.method === 'signal' ? (
+          <li className={visit.interacted ? 'text-status-ai' : 'text-slate-400'}>
+            {visit.interacted ? 'AI used' : 'AI available, not used'}
+          </li>
+        ) : interactions.length === 0 ? (
           <li className="text-slate-400">No interactions</li>
         ) : (
           interactions.map((interaction) => (

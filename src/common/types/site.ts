@@ -1,10 +1,9 @@
-export type SignalId =
-  | 'ai-network'
-  | 'ai-script'
-  | 'ai-disclaimer'
-  | 'keyword'
-  | 'prompt-input'
-  | 'chat-controls';
+export type SignalId = 'ai-word' | 'prompt-wording' | 'model-picker' | 'ai-nearby' | 'send-control';
+
+export interface SignalResult {
+  confidence: number;
+  signals: SignalId[];
+}
 
 export interface SignalDefinition {
   label: string;
@@ -35,13 +34,12 @@ export interface AiVisit {
   hostname: string;
   method: DetectionMethod;
   signals: SignalId[];
+  confidence: number;
   detectedAt: number;
   interacted: boolean;
   interactionType: InteractionType | null;
   interactions: Interaction[];
 }
-
-export type ConfidenceLevel = 'none' | 'low' | 'medium' | 'high';
 
 export interface AiSiteStatus {
   status: 'ai';
@@ -50,7 +48,7 @@ export interface AiSiteStatus {
   category: string;
   method: DetectionMethod;
   signals: SignalId[];
-  confidence: ConfidenceLevel;
+  confidence: number;
   lastUsedAt: number | null;
 }
 
@@ -58,7 +56,7 @@ export interface NotAiSiteStatus {
   status: 'not-ai';
   hostname: string;
   signals: SignalId[];
-  confidence: ConfidenceLevel;
+  confidence: number;
 }
 
 export type SiteStatus = AiSiteStatus | NotAiSiteStatus | { status: 'unsupported' };

@@ -1,9 +1,11 @@
-import type { AiVisit, InteractionType, SiteStatus } from '@/common/types/site';
+import type { AiVisit, InteractionType, SignalResult, SiteStatus } from '@/common/types/site';
 
 export const MESSAGE = {
   GET_SITE_STATUS: 'GET_SITE_STATUS',
   PAGE_LOADED: 'PAGE_LOADED',
-  GET_HOSTNAME: 'GET_HOSTNAME',
+  GET_PAGE_INFO: 'GET_PAGE_INFO',
+  AI_DETECTED: 'AI_DETECTED',
+  AI_USED: 'AI_USED',
   GET_VISITS: 'GET_VISITS',
   CLEAR_VISITS: 'CLEAR_VISITS',
   VISITS_UPDATED: 'VISITS_UPDATED',
@@ -19,12 +21,27 @@ export interface InteractionPayload {
   interactionType: InteractionType;
 }
 
+export interface PageInfo {
+  hostname: string;
+  signalResult: SignalResult | null;
+}
+
+export interface AiDetectedPayload extends SignalResult {
+  hostname: string;
+}
+
+export interface VisitIdPayload {
+  visitId: string;
+}
+
 export type PageLoadedResult = { isAi: false } | { isAi: true; visitId: string };
 
 export interface MessageMap {
   [MESSAGE.GET_SITE_STATUS]: { payload: void; response: SiteStatus };
   [MESSAGE.PAGE_LOADED]: { payload: HostnamePayload; response: PageLoadedResult };
-  [MESSAGE.GET_HOSTNAME]: { payload: void; response: HostnamePayload };
+  [MESSAGE.GET_PAGE_INFO]: { payload: void; response: PageInfo };
+  [MESSAGE.AI_DETECTED]: { payload: AiDetectedPayload; response: VisitIdPayload };
+  [MESSAGE.AI_USED]: { payload: VisitIdPayload; response: void };
   [MESSAGE.GET_VISITS]: { payload: void; response: AiVisit[] };
   [MESSAGE.CLEAR_VISITS]: { payload: void; response: void };
   [MESSAGE.VISITS_UPDATED]: { payload: AiVisit[]; response: void };

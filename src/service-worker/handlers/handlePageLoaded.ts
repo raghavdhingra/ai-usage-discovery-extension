@@ -15,6 +15,7 @@ export async function handlePageLoaded({ hostname }: HostnamePayload): Promise<P
     hostname,
     method: 'domain',
     signals: [],
+    confidence: 100,
     detectedAt: Date.now(),
     interacted: false,
     interactionType: null,
