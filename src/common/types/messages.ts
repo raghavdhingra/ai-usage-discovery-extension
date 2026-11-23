@@ -15,11 +15,13 @@ export interface HostnamePayload {
 }
 
 export interface InteractionPayload {
-  visitId: string;
+  hostname: string;
   interactionType: InteractionType;
 }
 
-export type PageLoadedResult = { isAi: false } | { isAi: true; visitId: string };
+export interface PageLoadedResult {
+  isAi: boolean;
+}
 
 export interface MessageMap {
   [MESSAGE.GET_SITE_STATUS]: { payload: void; response: SiteStatus };

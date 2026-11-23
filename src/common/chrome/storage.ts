@@ -19,7 +19,12 @@ export function updateVisits(update: (visits: AiVisit[]) => AiVisit[]): Promise<
   return write;
 }
 
-type TabSession = Record<string, string>;
+export interface SessionEntry {
+  visitId: string;
+  lastActiveAt: number;
+}
+
+type TabSession = Record<string, SessionEntry>;
 
 const tabKey = (tabId: number) => `tab-${tabId}`;
 
@@ -28,14 +33,14 @@ async function getTabSession(tabId: number): Promise<TabSession> {
   return (result[tabKey(tabId)] as TabSession | undefined) ?? {};
 }
 
-export async function getSessionVisitId(tabId: number, toolId: string): Promise<string | undefined> {
+export async function getSessionEntry(tabId: number, toolId: string): Promise<SessionEntry | undefined> {
   const session = await getTabSession(tabId);
   return session[toolId];
 }
 
-export async function setSessionVisitId(tabId: number, toolId: string, visitId: string): Promise<void> {
+export async function setSessionEntry(tabId: number, toolId: string, entry: SessionEntry): Promise<void> {
   const session = await getTabSession(tabId);
-  session[toolId] = visitId;
+  session[toolId] = entry;
   await browser.storage.session.set({ [tabKey(tabId)]: session });
 }
 

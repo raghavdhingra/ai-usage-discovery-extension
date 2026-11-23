@@ -1,6 +1,7 @@
 import type { InteractionType } from '@/common/types/site';
 
 const PROMPT_BOX = 'textarea, [contenteditable="true"]';
+const REPEAT_WINDOW_MS = 2000;
 
 function isPromptBox(element: EventTarget | undefined): boolean {
   return (
@@ -10,30 +11,40 @@ function isPromptBox(element: EventTarget | undefined): boolean {
 }
 
 export function trackInteractions(onInteraction: (type: InteractionType) => void): void {
-  const onKeyDown = (event: KeyboardEvent) => {
-    const isEnter = event.key === 'Enter' && !event.shiftKey && !event.isComposing;
-    if (isEnter && isPromptBox(event.composedPath()[0])) done();
-  };
+  let lastReportedAt = 0;
 
-  const onClick = (event: MouseEvent) => {
-    const target = event.composedPath()[0];
-    const button = target instanceof Element ? target.closest('button, [role="button"]') : null;
-    if (button && /send/i.test(button.getAttribute('aria-label') ?? '')) done();
-  };
-
-  const onSubmit = (event: SubmitEvent) => {
-    const form = event.target;
-    if (form instanceof HTMLFormElement && form.querySelector(PROMPT_BOX)) done();
-  };
-
-  function done() {
-    document.removeEventListener('keydown', onKeyDown, true);
-    document.removeEventListener('click', onClick, true);
-    document.removeEventListener('submit', onSubmit, true);
+  function report() {
+    const now = Date.now();
+    if (now - lastReportedAt < REPEAT_WINDOW_MS) return;
+    lastReportedAt = now;
     onInteraction('prompt-submit');
   }
 
-  document.addEventListener('keydown', onKeyDown, true);
-  document.addEventListener('click', onClick, true);
-  document.addEventListener('submit', onSubmit, true);
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      const isEnter = event.key === 'Enter' && !event.shiftKey && !event.isComposing;
+      if (isEnter && isPromptBox(event.composedPath()[0])) report();
+    },
+    true,
+  );
+
+  document.addEventListener(
+    'click',
+    (event) => {
+      const target = event.composedPath()[0];
+      const button = target instanceof Element ? target.closest('button, [role="button"]') : null;
+      if (button && /send/i.test(button.getAttribute('aria-label') ?? '')) report();
+    },
+    true,
+  );
+
+  document.addEventListener(
+    'submit',
+    (event) => {
+      const form = event.target;
+      if (form instanceof HTMLFormElement && form.querySelector(PROMPT_BOX)) report();
+    },
+    true,
+  );
 }
