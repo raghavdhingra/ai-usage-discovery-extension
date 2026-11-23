@@ -17,7 +17,8 @@ function renderView(state: PopupState) {
       return (
         <NoticeView variant="unsupported">
           This might be a browser page (like <code className="text-xs">chrome://</code>) or the
-          Chrome Web Store, where extensions aren't allowed to run.
+          Chrome Web Store, where extensions aren't allowed to run. If the page was open before
+          Straiker was installed, try refreshing it.
         </NoticeView>
       );
     default:

@@ -1,18 +1,35 @@
 import { getVisits } from '@/common/chrome/storage';
-import { getActiveTabId, sendMessageToTab } from '@/common/chrome/tabs';
+import { getActiveTab, sendMessageToTab } from '@/common/chrome/tabs';
 import { MESSAGE } from '@/common/types/messages';
 import type { SiteStatus } from '@/common/types/site';
 import { matchDomain } from '@/service-worker/detection/matchDomain';
 
-async function getActiveHostname(): Promise<string | null> {
-  const tabId = await getActiveTabId();
-  if (tabId === undefined) return null;
+const RETRY_INTERVAL_MS = 300;
+const RETRY_TIMEOUT_MS = 2000;
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function askTabForHostname(tabId: number): Promise<string | null> {
   try {
     const { hostname } = await sendMessageToTab(tabId, MESSAGE.GET_HOSTNAME);
     return hostname || null;
   } catch {
     return null;
+  }
+}
+
+async function getActiveHostname(): Promise<string | null> {
+  const giveUpAt = Date.now() + RETRY_TIMEOUT_MS;
+
+  while (true) {
+    const tab = await getActiveTab();
+    if (!tab) return null;
+
+    const hostname = await askTabForHostname(tab.id);
+    if (hostname) return hostname;
+
+    if (!tab.isLoading || Date.now() >= giveUpAt) return null;
+    await wait(RETRY_INTERVAL_MS);
   }
 }
 

@@ -1,8 +1,14 @@
 import type { MessagePayload, MessageResponse, MessageType } from '@/common/types/messages';
 
-export async function getActiveTabId(): Promise<number | undefined> {
+export interface ActiveTab {
+  id: number;
+  isLoading: boolean;
+}
+
+export async function getActiveTab(): Promise<ActiveTab | undefined> {
   const [tab] = await browser.tabs.query({ active: true, lastFocusedWindow: true });
-  return tab?.id;
+  if (tab?.id === undefined) return undefined;
+  return { id: tab.id, isLoading: tab.status === 'loading' };
 }
 
 export function sendMessageToTab<T extends MessageType>(
