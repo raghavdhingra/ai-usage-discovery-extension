@@ -15,13 +15,11 @@ export interface HostnamePayload {
 }
 
 export interface InteractionPayload {
-  hostname: string;
+  visitId: string;
   interactionType: InteractionType;
 }
 
-export interface PageLoadedResult {
-  isAi: boolean;
-}
+export type PageLoadedResult = { isAi: false } | { isAi: true; visitId: string };
 
 export interface MessageMap {
   [MESSAGE.GET_SITE_STATUS]: { payload: void; response: SiteStatus };
@@ -38,10 +36,6 @@ export type MessageType = keyof MessageMap;
 export type MessagePayload<T extends MessageType> = MessageMap[T]['payload'];
 
 export type MessageResponse<T extends MessageType> = MessageMap[T]['response'];
-
-export interface MessageSender {
-  tabId?: number;
-}
 
 export interface Message<T extends MessageType = MessageType> {
   type: T;

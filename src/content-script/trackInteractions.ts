@@ -13,18 +13,18 @@ function isPromptBox(element: EventTarget | undefined): boolean {
 export function trackInteractions(onInteraction: (type: InteractionType) => void): void {
   let lastReportedAt = 0;
 
-  function report() {
+  function report(type: InteractionType) {
     const now = Date.now();
     if (now - lastReportedAt < REPEAT_WINDOW_MS) return;
     lastReportedAt = now;
-    onInteraction('prompt-submit');
+    onInteraction(type);
   }
 
   document.addEventListener(
     'keydown',
     (event) => {
       const isEnter = event.key === 'Enter' && !event.shiftKey && !event.isComposing;
-      if (isEnter && isPromptBox(event.composedPath()[0])) report();
+      if (isEnter && isPromptBox(event.composedPath()[0])) report('prompt-submit');
     },
     true,
   );
@@ -34,7 +34,9 @@ export function trackInteractions(onInteraction: (type: InteractionType) => void
     (event) => {
       const target = event.composedPath()[0];
       const button = target instanceof Element ? target.closest('button, [role="button"]') : null;
-      if (button && /send/i.test(button.getAttribute('aria-label') ?? '')) report();
+      const label = button?.getAttribute('aria-label') ?? '';
+      if (/voice/i.test(label)) report('ai-button');
+      else if (/send/i.test(label)) report('prompt-submit');
     },
     true,
   );
@@ -43,7 +45,7 @@ export function trackInteractions(onInteraction: (type: InteractionType) => void
     'submit',
     (event) => {
       const form = event.target;
-      if (form instanceof HTMLFormElement && form.querySelector(PROMPT_BOX)) report();
+      if (form instanceof HTMLFormElement && form.querySelector(PROMPT_BOX)) report('prompt-submit');
     },
     true,
   );

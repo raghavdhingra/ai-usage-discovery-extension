@@ -1,13 +1,21 @@
-import type { InteractionPayload, MessageSender } from '@/common/types/messages';
-import { matchDomain } from '@/service-worker/detection/matchDomain';
-import { recordActivity } from '@/service-worker/recordActivity';
+import type { InteractionPayload } from '@/common/types/messages';
+import type { AiVisit, Interaction } from '@/common/types/site';
+import { getInteractions } from '@/common/utils/interactions';
+import { saveVisits } from '@/service-worker/saveVisits';
 
-export async function handleInteraction(
-  { hostname, interactionType }: InteractionPayload,
-  { tabId }: MessageSender,
-): Promise<void> {
-  const tool = matchDomain(hostname);
-  if (!tool) return;
+function addInteraction(visit: AiVisit, interaction: Interaction): AiVisit {
+  return {
+    ...visit,
+    interacted: true,
+    interactionType: visit.interactionType ?? interaction.type,
+    interactions: [...getInteractions(visit), interaction],
+  };
+}
 
-  await recordActivity({ tabId, tool, hostname, interactionType });
+export function handleInteraction({ visitId, interactionType }: InteractionPayload): Promise<void> {
+  const interaction: Interaction = { type: interactionType, at: Date.now() };
+
+  return saveVisits((visits) =>
+    visits.map((visit) => (visit.visitId === visitId ? addInteraction(visit, interaction) : visit)),
+  );
 }

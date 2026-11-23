@@ -1,14 +1,14 @@
 interface StatTilesProps {
   tools: number;
   visits: number;
-  used: number;
+  interactions: number;
 }
 
-export function StatTiles({ tools, visits, used }: StatTilesProps) {
+export function StatTiles({ tools, visits, interactions }: StatTilesProps) {
   const stats = [
     { label: 'Tools', value: tools },
     { label: 'Visits', value: visits },
-    { label: 'Used', value: used },
+    { label: 'Interactions', value: interactions },
   ];
 
   return (

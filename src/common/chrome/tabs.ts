@@ -18,7 +18,3 @@ export function sendMessageToTab<T extends MessageType>(
 ): Promise<MessageResponse<T>> {
   return browser.tabs.sendMessage(tabId, { type, payload });
 }
-
-export function onTabRemoved(callback: (tabId: number) => void): void {
-  browser.tabs.onRemoved.addListener((tabId) => callback(tabId));
-}

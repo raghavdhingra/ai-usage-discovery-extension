@@ -18,36 +18,3 @@ export function updateVisits(update: (visits: AiVisit[]) => AiVisit[]): Promise<
   writeQueue = write.catch(() => undefined);
   return write;
 }
-
-export interface SessionEntry {
-  visitId: string;
-  lastActiveAt: number;
-}
-
-type TabSession = Record<string, SessionEntry>;
-
-const tabKey = (tabId: number) => `tab-${tabId}`;
-
-async function getTabSession(tabId: number): Promise<TabSession> {
-  const result = await browser.storage.session.get(tabKey(tabId));
-  return (result[tabKey(tabId)] as TabSession | undefined) ?? {};
-}
-
-export async function getSessionEntry(tabId: number, toolId: string): Promise<SessionEntry | undefined> {
-  const session = await getTabSession(tabId);
-  return session[toolId];
-}
-
-export async function setSessionEntry(tabId: number, toolId: string, entry: SessionEntry): Promise<void> {
-  const session = await getTabSession(tabId);
-  session[toolId] = entry;
-  await browser.storage.session.set({ [tabKey(tabId)]: session });
-}
-
-export function removeTabSession(tabId: number): Promise<void> {
-  return browser.storage.session.remove(tabKey(tabId));
-}
-
-export function clearTabSessions(): Promise<void> {
-  return browser.storage.session.clear();
-}

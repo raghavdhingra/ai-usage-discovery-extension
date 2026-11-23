@@ -22,6 +22,11 @@ export interface AiTool {
 
 export type InteractionType = 'prompt-submit' | 'ai-button';
 
+export interface Interaction {
+  type: InteractionType;
+  at: number;
+}
+
 export interface AiVisit {
   visitId: string;
   toolId: string;
@@ -33,6 +38,7 @@ export interface AiVisit {
   detectedAt: number;
   interacted: boolean;
   interactionType: InteractionType | null;
+  interactions: Interaction[];
 }
 
 export type ConfidenceLevel = 'none' | 'low' | 'medium' | 'high';

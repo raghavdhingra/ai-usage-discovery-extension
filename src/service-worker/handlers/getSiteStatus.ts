@@ -2,6 +2,7 @@ import { getVisits } from '@/common/chrome/storage';
 import { getActiveTab, sendMessageToTab } from '@/common/chrome/tabs';
 import { MESSAGE } from '@/common/types/messages';
 import type { SiteStatus } from '@/common/types/site';
+import { getLastInteractionAt } from '@/common/utils/interactions';
 import { matchDomain } from '@/service-worker/detection/matchDomain';
 
 const RETRY_INTERVAL_MS = 300;
@@ -40,10 +41,8 @@ export async function getSiteStatus(): Promise<SiteStatus> {
   const tool = matchDomain(hostname);
   if (!tool) return { status: 'not-ai', hostname, signals: [], confidence: 'none' };
 
-  const usedTimes = (await getVisits())
-    .filter((visit) => visit.toolId === tool.toolId && visit.interacted)
-    .map((visit) => visit.detectedAt);
-  const lastUsedAt = usedTimes.length > 0 ? Math.max(...usedTimes) : null;
+  const toolVisits = (await getVisits()).filter((visit) => visit.toolId === tool.toolId);
+  const lastUsedAt = getLastInteractionAt(toolVisits);
 
   return {
     status: 'ai',

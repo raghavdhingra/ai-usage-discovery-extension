@@ -14,8 +14,9 @@ export default defineContentScript({
       .then((result) => {
         if (!result?.isAi) return;
 
+        const { visitId } = result;
         trackInteractions((interactionType) => {
-          sendMessage(MESSAGE.INTERACTED, { hostname, interactionType }).catch(() => {});
+          sendMessage(MESSAGE.INTERACTED, { visitId, interactionType }).catch(() => {});
         });
       })
       .catch(() => {});

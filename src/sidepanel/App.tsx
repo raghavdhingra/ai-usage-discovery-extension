@@ -1,4 +1,5 @@
 import { BrandHeader } from '@/common/components/BrandHeader';
+import { countInteractions } from '@/common/utils/interactions';
 import { Loader } from '@/common/components/Loader';
 import { StatTiles } from '@/sidepanel/components/StatTiles';
 import { ToolCard } from '@/sidepanel/components/ToolCard';
@@ -27,7 +28,7 @@ export function App() {
             <StatTiles
               tools={groups.length}
               visits={visits.length}
-              used={visits.filter((visit) => visit.interacted).length}
+              interactions={countInteractions(visits)}
             />
 
             <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Detected tools</span>

@@ -12,3 +12,19 @@ export function formatRelativeTime(timestamp: number, now: number = Date.now()):
   const days = Math.floor(diff / DAY);
   return `${days} ${days === 1 ? 'day' : 'days'} ago`;
 }
+
+export function formatDateTime(timestamp: number, now: number = Date.now()): string {
+  const date = new Date(timestamp);
+  const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const today = new Date(now).toDateString();
+  const yesterday = new Date(now - DAY).toDateString();
+
+  if (date.toDateString() === today) return `Today, ${time}`;
+  if (date.toDateString() === yesterday) return `Yesterday, ${time}`;
+  return `${date.toLocaleDateString([], { day: 'numeric', month: 'short' })}, ${time}`;
+}
+
+export function formatTime(timestamp: number): string {
+  return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
